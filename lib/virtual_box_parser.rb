@@ -1,4 +1,4 @@
-class VirtualBoxPropertyParser
+class VirtualBoxParser
 	def initialize
 		reset
 	end
@@ -6,8 +6,8 @@ class VirtualBoxPropertyParser
 	def parse_detailed_vminfo(iostream)
 		property_set = {}
 		iostream.each_line do |line|
-			key, value = line.chomp.split('=')
-			value = value[1...-1]
+			key, value = line.chomp.split('=', 2)
+			value = (value[0] == '"') ? value[1...-1] : value
 			property_set[key] = value
 		end
 		@vminfo_properties << property_set

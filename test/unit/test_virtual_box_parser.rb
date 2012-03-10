@@ -2,13 +2,13 @@ require 'test/unit'
 require 'mocha'
 require 'virtual_box_parser'
 
-class VirtualBoxPropertyParserTest < Test::Unit::TestCase
+class VirtualBoxParserTest < Test::Unit::TestCase
 
 	def test_parse_detailed_vminfo_should_extract_the_expected_number_of_properties
 		receiver = mock()
-		receiver.expects(:receive_virtualbox_vminfo).once().with() { |value| value.class == Hash and value['ostype'] == 'RedHat' }
+		receiver.expects(:receive_virtualbox_vminfo).once().with() { |value| value.class == Hash and value['ostype'] == 'RedHat' and value['memory'] == '380' }
 
-		instance = VirtualBoxPropertyParser.new
+		instance = VirtualBoxParser.new
 		instance.parse_detailed_vminfo(sample_config_io)
 		instance.tell_vminfo(receiver)
 	end
@@ -16,12 +16,17 @@ class VirtualBoxPropertyParserTest < Test::Unit::TestCase
 	def test_reset_clears_vminfo
 		receiver = mock()
 		receiver.expects(:receive_vminfo).never
-		instance = VirtualBoxPropertyParser.new
+		instance = VirtualBoxParser.new
 		instance.parse_detailed_vminfo(sample_config_io)
 		instance.reset
 		instance.tell_vminfo(receiver)
 	end
 
+	SERIAL_PORT_CONFIG=<<-EOT
+uart1="0x03f8,4"
+uartmode1="client,/tmp/Centos57_com1"
+uart2="off"
+EOT
 
 # VBoxManage showvminfo --machinereadable --details 0fc20e1b-d21f-40b4-b13c-69d1438503fb
 	SAMPLE_CONFIG=<<-"EOT"
